@@ -10,7 +10,10 @@
     "build": "./node_modules/.bin/webpack --progress --display-reasons --display-modules --config webpack.config.js",
     "build:helpers": "./node_modules/.bin/babel-external-helpers | ./node_modules/.bin/minify --mangle false >> js/helpers.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "react-modal": "^3.4.5"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -35,14 +38,14 @@
     "eslint-plugin-react": "^7.1.0",
     "prop-types": "^15.6.0",
     "qs": "^6.5.1",
+    "query-string": "^5.0.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "serve": "^6.1.0",
-    "superagent": "^3.8.1",
-    "webpack": "^3.6.0",
-    "query-string": "^5.0.1",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
-    "superagent-cache": "^2.0.0"
+    "serve": "^6.1.0",
+    "superagent": "^3.8.1",
+    "superagent-cache": "^2.0.0",
+    "webpack": "^3.6.0"
   }
 }
