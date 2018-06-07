@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -108,11 +108,11 @@ if (typeof window !== 'undefined') {
   root = this;
 }
 
-var Emitter = __webpack_require__(13);
-var RequestBase = __webpack_require__(14);
-var isObject = __webpack_require__(4);
-var ResponseBase = __webpack_require__(15);
-var Agent = __webpack_require__(17);
+var Emitter = __webpack_require__(16);
+var RequestBase = __webpack_require__(17);
+var isObject = __webpack_require__(7);
+var ResponseBase = __webpack_require__(18);
+var Agent = __webpack_require__(20);
 
 /**
  * Noop.
@@ -1042,7 +1042,7 @@ if (true) {
   // By explicitly using `prop-types` you are opting into new development behavior.
   // http://fb.me/prop-types-in-prod
   var throwOnDirectAccess = true;
-  module.exports = __webpack_require__(19)(isValidElement, throwOnDirectAccess);
+  module.exports = __webpack_require__(22)(isValidElement, throwOnDirectAccess);
 } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
@@ -1051,6 +1051,49 @@ if (true) {
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports) {
+
+/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
+module.exports = __webpack_amd_options__;
+
+/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.canUseDOM = undefined;
+
+var _exenv = __webpack_require__(41);
+
+var _exenv2 = _interopRequireDefault(_exenv);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+var EE = _exenv2.default;
+
+var SafeHTMLElement = EE.canUseDOM ? window.HTMLElement : {};
+
+var canUseDOM = exports.canUseDOM = EE.canUseDOM;
+
+exports.default = SafeHTMLElement;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = ReactDOM;
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1071,7 +1114,7 @@ function isObject(obj) {
 module.exports = isObject;
 
 /***/ }),
-/* 5 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1113,7 +1156,7 @@ emptyFunction.thatReturnsArgument = function (arg) {
 module.exports = emptyFunction;
 
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1172,7 +1215,7 @@ function invariant(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1186,7 +1229,7 @@ module.exports = invariant;
 
 
 
-var emptyFunction = __webpack_require__(5);
+var emptyFunction = __webpack_require__(8);
 
 /**
  * Similar to invariant but only logs a warning if the condition is not met.
@@ -1240,7 +1283,7 @@ if (true) {
 module.exports = warning;
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1258,28 +1301,160 @@ var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 module.exports = ReactPropTypesSecret;
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports) {
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
-module.exports = __webpack_amd_options__;
+"use strict";
 
-/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = findTabbableDescendants;
+/*!
+ * Adapted from jQuery UI core
+ *
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/category/ui-core/
+ */
+
+var tabbableNode = /input|select|textarea|button|object/;
+
+function hidesContents(element) {
+  var zeroSize = element.offsetWidth <= 0 && element.offsetHeight <= 0;
+
+  // If the node is empty, this is good enough
+  if (zeroSize && !element.innerHTML) return true;
+
+  // Otherwise we need to check some styles
+  var style = window.getComputedStyle(element);
+  return zeroSize ? style.getPropertyValue("overflow") !== "visible" : style.getPropertyValue("display") == "none";
+}
+
+function visible(element) {
+  var parentElement = element;
+  while (parentElement) {
+    if (parentElement === document.body) break;
+    if (hidesContents(parentElement)) return false;
+    parentElement = parentElement.parentNode;
+  }
+  return true;
+}
+
+function focusable(element, isTabIndexNotNaN) {
+  var nodeName = element.nodeName.toLowerCase();
+  var res = tabbableNode.test(nodeName) && !element.disabled || (nodeName === "a" ? element.href || isTabIndexNotNaN : isTabIndexNotNaN);
+  return res && visible(element);
+}
+
+function tabbable(element) {
+  var tabIndex = element.getAttribute("tabindex");
+  if (tabIndex === null) tabIndex = undefined;
+  var isTabIndexNaN = isNaN(tabIndex);
+  return (isTabIndexNaN || tabIndex >= 0) && focusable(element, !isTabIndexNaN);
+}
+
+function findTabbableDescendants(element) {
+  return [].slice.call(element.querySelectorAll("*"), 0).filter(tabbable);
+}
+module.exports = exports["default"];
 
 /***/ }),
-/* 10 */
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.assertNodeList = assertNodeList;
+exports.setElement = setElement;
+exports.validateElement = validateElement;
+exports.hide = hide;
+exports.show = show;
+exports.documentNotReadyOrSSRTesting = documentNotReadyOrSSRTesting;
+exports.resetForTesting = resetForTesting;
+
+var _warning = __webpack_require__(40);
+
+var _warning2 = _interopRequireDefault(_warning);
+
+var _safeHTMLElement = __webpack_require__(5);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+var globalElement = null;
+
+function assertNodeList(nodeList, selector) {
+  if (!nodeList || !nodeList.length) {
+    throw new Error("react-modal: No elements were found for selector " + selector + ".");
+  }
+}
+
+function setElement(element) {
+  var useElement = element;
+  if (typeof useElement === "string" && _safeHTMLElement.canUseDOM) {
+    var el = document.querySelectorAll(useElement);
+    assertNodeList(el, useElement);
+    useElement = "length" in el ? el[0] : el;
+  }
+  globalElement = useElement || globalElement;
+  return globalElement;
+}
+
+function validateElement(appElement) {
+  if (!appElement && !globalElement) {
+    (0, _warning2.default)(false, ["react-modal: App element is not defined.", "Please use `Modal.setAppElement(el)` or set `appElement={el}`.", "This is needed so screen readers don't see main content", "when modal is opened. It is not recommended, but you can opt-out", "by setting `ariaHideApp={false}`."].join(" "));
+
+    return false;
+  }
+
+  return true;
+}
+
+function hide(appElement) {
+  if (validateElement(appElement)) {
+    (appElement || globalElement).setAttribute("aria-hidden", "true");
+  }
+}
+
+function show(appElement) {
+  if (validateElement(appElement)) {
+    (appElement || globalElement).removeAttribute("aria-hidden");
+  }
+}
+
+function documentNotReadyOrSSRTesting() {
+  globalElement = null;
+}
+
+function resetForTesting() {
+  globalElement = null;
+}
+
+/***/ }),
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_cart_block__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_cart_form__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_cart_add__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_cart_complement__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_cart_block__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_cart_form__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_cart_add__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_cart_complement__ = __webpack_require__(32);
 
 
 
@@ -1305,13 +1480,7 @@ if (document.getElementById('reactCartComplement')) {
 }
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports) {
-
-module.exports = ReactDOM;
-
-/***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1320,7 +1489,7 @@ module.exports = ReactDOM;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_superagent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cart__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cart__ = __webpack_require__(21);
 
 
 
@@ -1358,6 +1527,7 @@ var CartBlock = function (_Component) {
         for (var i in body) {
           count += body[i].order_items.length;
         }
+        // console.log("carts11111", body);
         _this2.setState({
           loaded: true,
           count: count,
@@ -1444,7 +1614,7 @@ var CartBlock = function (_Component) {
 /* harmony default export */ __webpack_exports__["a"] = (CartBlock);
 
 /***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1607,7 +1777,7 @@ Emitter.prototype.hasListeners = function (event) {
 };
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1617,7 +1787,7 @@ Emitter.prototype.hasListeners = function (event) {
  * Module of mixed-in functions shared between node and client code
  */
 
-var isObject = __webpack_require__(4);
+var isObject = __webpack_require__(7);
 
 /**
  * Expose `RequestBase`.
@@ -2303,7 +2473,7 @@ RequestBase.prototype._setTimeouts = function () {
 };
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2313,7 +2483,7 @@ RequestBase.prototype._setTimeouts = function () {
  * Module dependencies.
  */
 
-var utils = __webpack_require__(16);
+var utils = __webpack_require__(19);
 
 /**
  * Expose `ResponseBase`.
@@ -2441,7 +2611,7 @@ ResponseBase.prototype._setStatusProperties = function (status) {
 };
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2518,7 +2688,7 @@ exports.cleanHeader = function (header, changesOrigin) {
 };
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, exports) {
 
 function Agent() {
@@ -2542,7 +2712,7 @@ Agent.prototype._setDefaults = function (req) {
 module.exports = Agent;
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2584,7 +2754,7 @@ var Cart = function (_Component) {
       __WEBPACK_IMPORTED_MODULE_3_superagent___default.a.get(url).end(function (err, _ref) {
         var body = _ref.body;
 
-        debugger;
+        // debugger;
         _this2.setState({
           cart: body
         });
@@ -2599,7 +2769,7 @@ var Cart = function (_Component) {
       __WEBPACK_IMPORTED_MODULE_3_superagent___default.a.delete(__WEBPACK_IMPORTED_MODULE_2__utils__["a" /* baseUrl */] + '/cart/' + this.state.cartId + '/items/' + item.order_item_id + '?_format=json').end(function (err, _ref2) {
         var body = _ref2.body;
 
-        debugger;
+        // debugger;
         _this3.doCartRefresh();
       });
     }
@@ -2608,6 +2778,7 @@ var Cart = function (_Component) {
     value: function render() {
       var _this4 = this;
 
+      console.log("40", this.state.cart);
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
         null,
@@ -2680,7 +2851,7 @@ Cart.propTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Cart);
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2693,13 +2864,13 @@ Cart.propTypes = {
 
 
 
-var emptyFunction = __webpack_require__(5);
-var invariant = __webpack_require__(6);
-var warning = __webpack_require__(7);
-var assign = __webpack_require__(20);
+var emptyFunction = __webpack_require__(8);
+var invariant = __webpack_require__(9);
+var warning = __webpack_require__(10);
+var assign = __webpack_require__(23);
 
-var ReactPropTypesSecret = __webpack_require__(8);
-var checkPropTypes = __webpack_require__(21);
+var ReactPropTypesSecret = __webpack_require__(11);
+var checkPropTypes = __webpack_require__(24);
 
 module.exports = function (isValidElement, throwOnDirectAccess) {
   /* global Symbol */
@@ -3202,7 +3373,7 @@ module.exports = function (isValidElement, throwOnDirectAccess) {
 };
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3298,7 +3469,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 };
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3312,9 +3483,9 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 if (true) {
-  var invariant = __webpack_require__(6);
-  var warning = __webpack_require__(7);
-  var ReactPropTypesSecret = __webpack_require__(8);
+  var invariant = __webpack_require__(9);
+  var warning = __webpack_require__(10);
+  var ReactPropTypesSecret = __webpack_require__(11);
   var loggedTypeFailures = {};
 }
 
@@ -3363,7 +3534,7 @@ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
 module.exports = checkPropTypes;
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3372,7 +3543,7 @@ module.exports = checkPropTypes;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_superagent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cart__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cart__ = __webpack_require__(26);
 
 
 
@@ -3439,7 +3610,7 @@ var CartForm = function (_Component) {
 /* harmony default export */ __webpack_exports__["a"] = (CartForm);
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3450,7 +3621,7 @@ var CartForm = function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_superagent__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_superagent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_superagent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_superagent_cache__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_superagent_cache__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_superagent_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_superagent_cache__);
 
 
@@ -3668,10 +3839,10 @@ Cart.propTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Cart);
 
 /***/ }),
-/* 24 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var utils = __webpack_require__(25);
+var utils = __webpack_require__(28);
 
 /**
  * superagentCache constructor
@@ -3685,7 +3856,7 @@ module.exports = function (superagent, cache, defaults) {
   if (!superagent) throw 'superagent-cache requires a superagent instance.';
 
   if (!superagent.patchedBySuperagentCache) {
-    superagent.cache = cache && cache.get ? cache : new (__webpack_require__(26))(cache);
+    superagent.cache = cache && cache.get ? cache : new (__webpack_require__(29))(cache);
     superagent.defaults = defaults || {};
     superagent.pendingRequests = {};
     var Request = superagent.Request;
@@ -3881,7 +4052,7 @@ module.exports = function (superagent, cache, defaults) {
 };
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -4108,7 +4279,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, exports) {
 
 /**
@@ -4405,7 +4576,7 @@ function cacheModule(config) {
 module.exports = cacheModule;
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4414,7 +4585,7 @@ module.exports = cacheModule;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_superagent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cart__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cart__ = __webpack_require__(31);
 
 
 
@@ -4491,7 +4662,7 @@ var CartAdd = function (_Component) {
 /* harmony default export */ __webpack_exports__["a"] = (CartAdd);
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4561,7 +4732,7 @@ var Cart = function (_Component) {
 /* harmony default export */ __webpack_exports__["a"] = (Cart);
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4570,7 +4741,7 @@ var Cart = function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_superagent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_superagent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__productos__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__productos__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_react_modal__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_react_modal___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_react_modal__);
 
@@ -4589,7 +4760,9 @@ var customStyles = {
     transform: 'translate(-50%, -50%)'
   }
 };
-__WEBPACK_IMPORTED_MODULE_4_react_modal___default.a.setAppElement('#reactCartComplement');
+// Modal.setAppElement('#reactCartComplement');
+// Modal.setAppElement('#reactCartForm');
+
 
 var CartComplement = function (_Component) {
   babelHelpers.inherits(CartComplement, _Component);
@@ -4611,7 +4784,7 @@ var CartComplement = function (_Component) {
     _this.onClickOpenC1 = _this.onClickOpenC1.bind(_this);
     _this.onClickOpenC2 = _this.onClickOpenC2.bind(_this);
     _this.onClickOpenC3 = _this.onClickOpenC3.bind(_this);
-    _this.setProducts = _this.setProducts.bind(_this);
+    // this.setProducts = this.setProducts.bind(this);
 
     _this.openModal = _this.openModal.bind(_this);
     _this.closeModal = _this.closeModal.bind(_this);
@@ -4626,11 +4799,13 @@ var CartComplement = function (_Component) {
   }, {
     key: 'closeModal',
     value: function closeModal() {
-      this.setState({ c1: false });
+
+      console.log("despues de cerrar");
+      this.getCarts();
     }
   }, {
-    key: 'getCarts',
-    value: function getCarts() {
+    key: 'getComplementos',
+    value: function getComplementos() {
       var _this2 = this;
 
       console.log('Getting complement3', drupalSettings);
@@ -4640,12 +4815,9 @@ var CartComplement = function (_Component) {
 
         console.log(body);
         var count = 0;
-        // for (let i in body) {
-        //   count += body[i].order_items.length;
-        // }
 
         _this2.setState({
-          loaded: true,
+          // loaded: true,
           c1: false,
           c2: false,
           c3: false,
@@ -4654,9 +4826,40 @@ var CartComplement = function (_Component) {
       });
     }
   }, {
+    key: 'getCarts',
+    value: function getCarts() {
+      var _this3 = this;
+
+      console.log('LOAD111111111 CART');
+      var x = Math.floor(Math.random() * 199998880 + 1);
+      // const url = `${baseUrl}/cart?_format=json`;
+      var url = '/cart?_format=json&t=' + x;
+      __WEBPACK_IMPORTED_MODULE_2_superagent___default.a.get(url).end(function (err, _ref2) {
+        var body = _ref2.body;
+
+        var count = 0;
+        for (var i in body) {
+          count += body[i].order_items.length;
+        }
+        console.log("body", body);
+
+        // this.setState({
+        //   loaded: true,
+        //   count: count,
+        //   c1: false,
+        //   productos: body.length > 0 ? body : [],
+        // });
+        _this3.state.loaded = true;
+        _this3.state.productos = body.length > 0 ? body : [];
+        _this3.state.c1 = false;
+        _this3.setState(_this3.state);
+      });
+    }
+  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       this.getCarts();
+      this.getComplementos();
     }
     // onClickExpand(event) {
     //   event.preventDefault();
@@ -4689,87 +4892,50 @@ var CartComplement = function (_Component) {
         c3: !this.state.c3
       });
     }
-  }, {
-    key: 'setProducts',
-    value: function setProducts(items) {
-      console.log("setProducts items 76", items);
-      var url_producto = drupalSettings.path.currentPath;
-      var numbers = url_producto.match(/\d+/g).map(Number);
-      console.log(numbers);
-      if (!this.state.productos) {
-        this.state.productos = {};
-      }
-      this.state.productos[numbers] = items;
-      this.setState(this.state);
-      console.log("index productos 86", this.state.productos);
-      this.setState({
-        c1: !this.state.c1
-      });
-    }
+
+    //  setProducts() {
+    //   //   this.getCarts();
+
+
+    //   //   // console.log("index productos 86",this.state.productos)
+    //   //    this.setState({
+    //   //     c1: !this.state.c1
+    //   //   });
+
+    //   }
+
   }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
-
       // <Cart complementos={this.state.complementos}/>
       if (!this.state.loaded) {
-        return null;
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          null,
+          'Cargando complementos'
+        );
       }
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'button',
-          { onClick: this.onClickOpenC1, className: 'button is-primary modal-button' },
+          { onClick: this.openModal, className: 'button is-primary modal-button' },
           'Complemento 1'
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'button',
-          { onClick: this.onClickOpenC2, className: 'button is-primary modal-button' },
-          'Complemento 2'
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'button',
-          { onClick: this.onClickOpenC3, className: 'button is-primary modal-button' },
-          'Complemento 3'
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'button',
-          { onClick: this.openModal },
-          'Open Modal'
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          __WEBPACK_IMPORTED_MODULE_4_react_modal___default.a,
+          'div',
           {
-            isOpen: this.state.c1,
-            onAfterOpen: this.afterOpenModal,
-            onRequestClose: this.closeModal,
-            style: customStyles,
-            contentLabel: 'Example Modal'
+            className: 'complemento1 modal ' + (this.state.c1 ? ['is-active'] : [])
           },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'h2',
-            { ref: function ref(subtitle) {
-                return _this3.subtitle = subtitle;
-              } },
-            'Hello'
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'button',
-            { onClick: this.closeModal },
-            'close'
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__productos__["a" /* default */], { complementos: this.state.complementos, productos: this.state.productos, cargar: this.setProducts })
-        ),
-        this.state.productos ? this.state.productos[2].map(function (item) {
-          return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'modal-background', onClick: this.closeModal }),
+          this.state.c1 ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__productos__["a" /* default */], { complementos: this.state.complementos, productos: this.state.productos }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             'div',
-            { key: item.cid, className: 'column is-one-quarter', 'data-id': item.cid },
-            item.cid,
-            item.producto,
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: item.image })
-          );
-        }) : 'Seleccione su producto',
+            null,
+            'Loading'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('button', { onClick: this.closeModal, className: 'modal-close is-large', 'aria-label': 'close' })
+        ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           {
@@ -4805,7 +4971,7 @@ var CartComplement = function (_Component) {
 /* harmony default export */ __webpack_exports__["a"] = (CartComplement);
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4816,13 +4982,17 @@ var CartComplement = function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_superagent__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_superagent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_superagent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_classnames__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_classnames__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_classnames___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_classnames__);
 
 
 
 
 
+// import superagentCache from 'superagent-cache';
+
+// superagentCache(superagent);
+// https://github.com/Tigatok/commerce_shipping-1/tree/2831602/create-a-shipment-object
 
 var Productos = function (_Component) {
   babelHelpers.inherits(Productos, _Component);
@@ -4838,15 +5008,17 @@ var Productos = function (_Component) {
     _this.state = {
       // Copy the prop into state so we can refresh it.
       complementos: props.complementos,
-      addCart: props.productos ? props.productos[2] : [],
-      // cartId: props.cart.order_id,
+      addCart: props.productos ? props.productos[0].order_items : [],
+      cartId: props.productos[0].order_id,
       langCode: drupalSettings.path.currentLanguage,
-      loading: false
+      loaded: false
     };
 
     _this.onClickSelect = _this.onClickSelect.bind(_this);
+    _this.getCarts = _this.getCarts.bind(_this);
     _this.BuscarClase = _this.BuscarClase.bind(_this);
     _this.renderRow = _this.renderRow.bind(_this);
+    _this.AddProductos = _this.AddProductos.bind(_this);
     return _this;
   }
   // https://github.com/reactjs/react-modal
@@ -4857,13 +5029,41 @@ var Productos = function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      console.log('componentDidMount state');
+      console.log('componentDidMount state', this.props.productos);
+      // this.getCarts();
+
       setTimeout(function () {
         _this2.setState(function () {
           console.log('setting state');
-          return { loading: true };
+          return { loaded: true };
         });
-      }, 1000);
+      }, 600);
+    }
+  }, {
+    key: 'getCarts',
+    value: function getCarts() {
+      var _this3 = this;
+
+      console.log('LOAD CART PRODUCTO');
+      var x = Math.floor(Math.random() * 199998880 + 1);
+
+      var url = '/cart?_format=json&t=' + x;
+      __WEBPACK_IMPORTED_MODULE_3_superagent___default.a.get(url).end(function (err, _ref) {
+        var body = _ref.body;
+
+        console.log("LOADDDDDD", body);
+
+        _this3.setState({
+          loaded: true,
+          addCart: body.length > 0 ? body[0].order_items : []
+        });
+
+        // this.state.loaded = true;
+        // this.state.addCart = body.length > 0 ? body[0].order_items : [];
+        // this.setState(
+        //   this.state
+        // );
+      });
     }
   }, {
     key: 'componentWillUnmount',
@@ -4881,7 +5081,7 @@ var Productos = function (_Component) {
     value: function BuscarClase(item) {
 
       for (var i = 0; i < this.state.addCart.length; i++) {
-        if (this.state.addCart[i].cid == item.cid) {
+        if (this.state.addCart[i].purchased_entity == item.cid) {
           // console.log("activado 11");
           // return "notification is-primary";
           return true;
@@ -4890,6 +5090,56 @@ var Productos = function (_Component) {
       // console.log("no active");
 
       // return false;
+    }
+  }, {
+    key: 'AddProductos',
+    value: function AddProductos(item) {
+      var _this4 = this;
+
+      // const body = {};
+      var url = '/cart/add?_format=json';
+
+      var payload = {
+        order_item_data: {
+          "purchased_entity_type": 'commerce_product_variation',
+          "purchased_entity_id": item.cid,
+          "quantity": "1"
+        }
+      };
+      console.log(payload);
+      __WEBPACK_IMPORTED_MODULE_3_superagent___default.a.post(url).set('Content-Type', 'application/json').send(payload).end(function (err, _ref2) {
+        var body = _ref2.body;
+
+
+        // console.log(err);
+        console.log("aregado", body);
+
+        _this4.state.addCart = body[0].order_items;
+
+        // this.state.addCart.push(item);
+        _this4.setState(_this4.state);
+        // debugger;
+        // console.log(body);
+        // this.setState({
+        //   cart: body,
+        // });
+      });
+    }
+  }, {
+    key: 'doItemDelete',
+    value: function doItemDelete(item, i) {
+      var _this5 = this;
+
+      // event.preventDefault();
+      __WEBPACK_IMPORTED_MODULE_3_superagent___default.a.delete('/cart/' + this.state.cartId + '/items/' + item.order_item_id + '?_format=json').end(function (err, _ref3) {
+        var body = _ref3.body;
+
+        // debugger;
+        // this.doProductosRefresh();
+        _this5.state.addCart.splice(i, 1);
+        _this5.setState(_this5.state);
+        // this.getCarts();
+      });
     }
   }, {
     key: 'onClickSelect',
@@ -4908,29 +5158,20 @@ var Productos = function (_Component) {
       var size = this.state.addCart.length;
       //  console.log("size", size);
       for (var i = 0; i < this.state.addCart.length; i++) {
-        // console.log("cid",item.cid);
-        // console.log("i",i);
-        // console.log("addCart",this.state.addCart[i]);
-        if (this.state.addCart[i].cid && this.state.addCart[i].cid == item.cid) {
-          //  delete this.state.addCart[i];
-          this.state.addCart.splice(i, 1);
-          //this.state.addCart.length = this.state.addCart.length - 1;
-          //  this.BuscarClase(item);
-          //  console.log("DELETECART",this.state.addCart);
-          this.setState(this.state);
+        if (this.state.addCart[i].purchased_entity && this.state.addCart[i].purchased_entity == item.cid) {
+          this.doItemDelete(this.state.addCart[i], i);
           return true;
         }
       }
 
-      this.state.addCart.push(item);
-      this.setState(this.state);
+      this.AddProductos(item);
       return true;
       // console.log("ADDCART",this.state.addCart)
     }
   }, {
     key: 'renderRow',
     value: function renderRow(item) {
-      var _this3 = this;
+      var _this6 = this;
 
       // console.log("119",this.state.addCart);
       var classes = __WEBPACK_IMPORTED_MODULE_4_classnames___default()('column is-one-quarter', { "notification is-primary": this.BuscarClase(item) });
@@ -4938,7 +5179,7 @@ var Productos = function (_Component) {
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
         { key: item.cid, className: classes, 'data-id': item.cid, onClick: function onClick() {
-            return _this3.onClickSelect(item);
+            return _this6.onClickSelect(item);
           } },
         item.cid,
         item.producto,
@@ -4948,12 +5189,12 @@ var Productos = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this7 = this;
 
       console.log("productos 90", this.props);
       console.log("state 91", this.state);
       // this.state.addCart = this.props.productos ? this.props.productos[2]:[];
-      if (this.state.loading) {
+      if (this.state.loaded) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           { className: 'modal-card hero is-white' },
@@ -4964,21 +5205,11 @@ var Productos = function (_Component) {
               'div',
               { className: 'columns is-multiline is-mobile' },
               this.state.complementos.map(function (item) {
-                return _this4.renderRow(item);
+                return _this7.renderRow(item);
               })
             )
           ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'footer',
-            null,
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              'button',
-              { className: 'button is-primary', onClick: function onClick() {
-                  return _this4.props.cargar(_this4.state.addCart);
-                } },
-              'Guardar'
-            )
-          )
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('footer', null)
         );
       } else {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -4995,7 +5226,7 @@ var Productos = function (_Component) {
 /* harmony default export */ __webpack_exports__["a"] = (Productos);
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -5037,7 +5268,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 	if (typeof module !== 'undefined' && module.exports) {
 		module.exports = classNames;
-	} else if ("function" === 'function' && babelHelpers.typeof(__webpack_require__(9)) === 'object' && __webpack_require__(9)) {
+	} else if ("function" === 'function' && babelHelpers.typeof(__webpack_require__(4)) === 'object' && __webpack_require__(4)) {
 		// register as 'classnames', consistent with npm package name
 		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
 			return classNames;
@@ -5047,175 +5278,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 		window.classNames = classNames;
 	}
 })();
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.canUseDOM = undefined;
-
-var _exenv = __webpack_require__(41);
-
-var _exenv2 = _interopRequireDefault(_exenv);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-
-var EE = _exenv2.default;
-
-var SafeHTMLElement = EE.canUseDOM ? window.HTMLElement : {};
-
-var canUseDOM = exports.canUseDOM = EE.canUseDOM;
-
-exports.default = SafeHTMLElement;
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = findTabbableDescendants;
-/*!
- * Adapted from jQuery UI core
- *
- * http://jqueryui.com
- *
- * Copyright 2014 jQuery Foundation and other contributors
- * Released under the MIT license.
- * http://jquery.org/license
- *
- * http://api.jqueryui.com/category/ui-core/
- */
-
-var tabbableNode = /input|select|textarea|button|object/;
-
-function hidesContents(element) {
-  var zeroSize = element.offsetWidth <= 0 && element.offsetHeight <= 0;
-
-  // If the node is empty, this is good enough
-  if (zeroSize && !element.innerHTML) return true;
-
-  // Otherwise we need to check some styles
-  var style = window.getComputedStyle(element);
-  return zeroSize ? style.getPropertyValue("overflow") !== "visible" : style.getPropertyValue("display") == "none";
-}
-
-function visible(element) {
-  var parentElement = element;
-  while (parentElement) {
-    if (parentElement === document.body) break;
-    if (hidesContents(parentElement)) return false;
-    parentElement = parentElement.parentNode;
-  }
-  return true;
-}
-
-function focusable(element, isTabIndexNotNaN) {
-  var nodeName = element.nodeName.toLowerCase();
-  var res = tabbableNode.test(nodeName) && !element.disabled || (nodeName === "a" ? element.href || isTabIndexNotNaN : isTabIndexNotNaN);
-  return res && visible(element);
-}
-
-function tabbable(element) {
-  var tabIndex = element.getAttribute("tabindex");
-  if (tabIndex === null) tabIndex = undefined;
-  var isTabIndexNaN = isNaN(tabIndex);
-  return (isTabIndexNaN || tabIndex >= 0) && focusable(element, !isTabIndexNaN);
-}
-
-function findTabbableDescendants(element) {
-  return [].slice.call(element.querySelectorAll("*"), 0).filter(tabbable);
-}
-module.exports = exports["default"];
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.assertNodeList = assertNodeList;
-exports.setElement = setElement;
-exports.validateElement = validateElement;
-exports.hide = hide;
-exports.show = show;
-exports.documentNotReadyOrSSRTesting = documentNotReadyOrSSRTesting;
-exports.resetForTesting = resetForTesting;
-
-var _warning = __webpack_require__(40);
-
-var _warning2 = _interopRequireDefault(_warning);
-
-var _safeHTMLElement = __webpack_require__(32);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-
-var globalElement = null;
-
-function assertNodeList(nodeList, selector) {
-  if (!nodeList || !nodeList.length) {
-    throw new Error("react-modal: No elements were found for selector " + selector + ".");
-  }
-}
-
-function setElement(element) {
-  var useElement = element;
-  if (typeof useElement === "string" && _safeHTMLElement.canUseDOM) {
-    var el = document.querySelectorAll(useElement);
-    assertNodeList(el, useElement);
-    useElement = "length" in el ? el[0] : el;
-  }
-  globalElement = useElement || globalElement;
-  return globalElement;
-}
-
-function validateElement(appElement) {
-  if (!appElement && !globalElement) {
-    (0, _warning2.default)(false, ["react-modal: App element is not defined.", "Please use `Modal.setAppElement(el)` or set `appElement={el}`.", "This is needed so screen readers don't see main content", "when modal is opened. It is not recommended, but you can opt-out", "by setting `ariaHideApp={false}`."].join(" "));
-
-    return false;
-  }
-
-  return true;
-}
-
-function hide(appElement) {
-  if (validateElement(appElement)) {
-    (appElement || globalElement).setAttribute("aria-hidden", "true");
-  }
-}
-
-function show(appElement) {
-  if (validateElement(appElement)) {
-    (appElement || globalElement).removeAttribute("aria-hidden");
-  }
-}
-
-function documentNotReadyOrSSRTesting() {
-  globalElement = null;
-}
-
-function resetForTesting() {
-  globalElement = null;
-}
 
 /***/ }),
 /* 35 */
@@ -5275,7 +5337,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(11);
+var _reactDom = __webpack_require__(6);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -5287,11 +5349,11 @@ var _ModalPortal = __webpack_require__(37);
 
 var _ModalPortal2 = _interopRequireDefault(_ModalPortal);
 
-var _ariaAppHider = __webpack_require__(34);
+var _ariaAppHider = __webpack_require__(13);
 
 var ariaAppHider = _interopRequireWildcard(_ariaAppHider);
 
-var _safeHTMLElement = __webpack_require__(32);
+var _safeHTMLElement = __webpack_require__(5);
 
 var _safeHTMLElement2 = _interopRequireDefault(_safeHTMLElement);
 
@@ -5595,7 +5657,7 @@ var _scopeTab = __webpack_require__(39);
 
 var _scopeTab2 = _interopRequireDefault(_scopeTab);
 
-var _ariaAppHider = __webpack_require__(34);
+var _ariaAppHider = __webpack_require__(13);
 
 var ariaAppHider = _interopRequireWildcard(_ariaAppHider);
 
@@ -5603,7 +5665,7 @@ var _classList = __webpack_require__(42);
 
 var classList = _interopRequireWildcard(_classList);
 
-var _safeHTMLElement = __webpack_require__(32);
+var _safeHTMLElement = __webpack_require__(5);
 
 var _safeHTMLElement2 = _interopRequireDefault(_safeHTMLElement);
 
@@ -6002,7 +6064,7 @@ exports.popWithoutFocus = popWithoutFocus;
 exports.setupScopedFocus = setupScopedFocus;
 exports.teardownScopedFocus = teardownScopedFocus;
 
-var _tabbable = __webpack_require__(33);
+var _tabbable = __webpack_require__(12);
 
 var _tabbable2 = _interopRequireDefault(_tabbable);
 
@@ -6098,7 +6160,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = scopeTab;
 
-var _tabbable = __webpack_require__(33);
+var _tabbable = __webpack_require__(12);
 
 var _tabbable2 = _interopRequireDefault(_tabbable);
 
@@ -6258,7 +6320,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 	};
 
-	if ("function" === 'function' && babelHelpers.typeof(__webpack_require__(9)) === 'object' && __webpack_require__(9)) {
+	if ("function" === 'function' && babelHelpers.typeof(__webpack_require__(4)) === 'object' && __webpack_require__(4)) {
 		!(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
 			return ExecutionEnvironment;
 		}).call(exports, __webpack_require__, exports, module),
