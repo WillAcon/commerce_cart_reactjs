@@ -18,7 +18,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   protected function alterRoutes(RouteCollection $collection) {
     $route = $collection->get('commerce_cart.page');
     if ($route) {
-      $route->setDefault('_controller', '\Drupal\commerce_cart_reactjs\Controller\CartController::cartPage');
+      //$route->setDefault('_controller', '\Drupal\commerce_cart_reactjs\Controller\CartController::cartPage');
     }
   }
 
