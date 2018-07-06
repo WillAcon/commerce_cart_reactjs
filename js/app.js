@@ -77,6 +77,7 @@ module.exports = React;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return baseUrl; });
 /* harmony export (immutable) */ __webpack_exports__["c"] = formatPrice;
 /* harmony export (immutable) */ __webpack_exports__["b"] = formatNewCart;
+/* unused harmony export BuscarChildren */
 var langCode = drupalSettings.path.currentLanguage;
 
 var baseUrl = '' + window.location.origin + drupalSettings.path.baseUrl;
@@ -90,15 +91,16 @@ function formatPrice(priceObject) {
 }
 
 function formatNewCart(cartObject) {
+  var Items = [];
+
+  var parents = [];
   var result = {
     order_item: []
   };
 
-  var parent = [];
-
   cartObject.map(function (item, index) {
-    console.log("item1114", item);
-    console.log("index1114", index);
+    console.log("item1119", item);
+    console.log("index1119", index);
 
     var objectTemp = {
       order_item_id: item.order_item_id,
@@ -112,29 +114,69 @@ function formatNewCart(cartObject) {
     };
 
     if (item.field_complementos) {
-      parent.push(objectTemp);
+      parents.push(objectTemp);
     }
 
     result.total_price = item.total_price;
     result.order_id = item.order_id;
-    // result.order_item[index] = objectTemp;
+    // Items.order_item[index] = objectTemp;
 
-    result['order_item'].push(objectTemp);
+    Items.push(objectTemp);
   });
 
-  parent.map(function (item, index) {
+  parents.map(function (parent, index) {
 
-    console.log("parent", item);
+    console.log("parent111", parent);
+    console.log("parent111", index);
+    result.order_item[index] = parent;
+    result.order_item[index]['childrens'] = [];
+    var strChildren = parent.complementos;
+    Items.map(function (item) {
+      // console.log("item.purchased_entity-", item.purchased_entity);
+      // console.log("ITEM-", BuscarChildren(strChildren, item.purchased_entity));
+      // console.log("item.parent-",item.parent);
+
+      if (BuscarChildren(strChildren, item.purchased_entity) && !item.parent) {
+        console.log("econtrado00", item);
+        result.order_item[index]['childrens'].push(item);
+      }
+    });
   });
 
+  // for(var i = 0; i < parents.length ; i++) {
+  //   Items.map((item) => {
+  //     console.log("ITEM1111", item);
+  //   });
+  // }
+
+  console.log("resultresult", result);
   // for(var i=0; i < cartObject.length; i++) {
 
   // }
-  console.log("REUSLTTT0", result);
 
-  console.log("PRENT", parent);
 
-  return "result";
+  return "Items";
+}
+
+function BuscarChildren(str, findChildren) {
+  var childrens = str.split(",");
+  // console.log("childrenschildrens",childrens);
+  // console.log("findChildren",findChildren);
+  var hasFive = false;
+
+  for (var counter = 0; counter < childrens.length; counter++) {
+    console.log("----------------------------------");
+    console.log("se childrens", childrens[counter]);
+    console.log("se findChildren", findChildren);
+    console.log("----------------------------------");
+    if (childrens[counter] == findChildren) {
+      console.log("se encontro", findChildren);
+      hasFive = true;
+      break;
+    }
+  }
+
+  return hasFive;
 }
 
 // [{
@@ -4408,7 +4450,8 @@ var CartComplement = function (_Component) {
   }, {
     key: 'getNewCart',
     value: function getNewCart() {
-      var url = __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* baseUrl */] + '/api/carts?_format=json';
+      var x = Math.floor(Math.random() * 199998880 + 1);
+      var url = __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* baseUrl */] + '/api/carts?_format=json&t=' + x;
       __WEBPACK_IMPORTED_MODULE_2_superagent___default.a.get(url).end(function (err, _ref3) {
         var body = _ref3.body;
 
