@@ -131,16 +131,26 @@ function formatNewCart(cartObject) {
     result.order_item[index] = parent;
     result.order_item[index]['childrens'] = [];
     var strChildren = parent.complementos;
-    Items.map(function (item) {
-      // console.log("item.purchased_entity-", item.purchased_entity);
-      // console.log("ITEM-", BuscarChildren(strChildren, item.purchased_entity));
-      // console.log("item.parent-",item.parent);
-
-      if (BuscarChildren(strChildren, item.purchased_entity) && !item.parent) {
-        console.log("econtrado00", item);
-        result.order_item[index]['childrens'].push(item);
+    for (var cont = 0; cont < Items.length; cont++) {
+      console.log("ITEEMMM", Items[cont]['purchased_entity']);
+      if (BuscarChildren(strChildren, Items[cont]['purchased_entity']) && !Items[cont]['parent']) {
+        console.log("econtrado00", Items[cont]['purchased_entity']);
+        result.order_item[index]['childrens'].push(Items[cont]);
       }
-    });
+    }
+    /*
+        Items.map((item) => {
+          // console.log("item.purchased_entity-", item.purchased_entity);
+          // console.log("ITEM-", BuscarChildren(strChildren, item.purchased_entity));
+          // console.log("item.parent-",item.parent);
+          
+          if(BuscarChildren(strChildren, item.purchased_entity) && !item.parent ) {
+            console.log("econtrado00", item);
+            result.order_item[index]['childrens'].push(item);
+          }
+    
+        });
+    */
   });
 
   // for(var i = 0; i < parents.length ; i++) {
@@ -149,34 +159,32 @@ function formatNewCart(cartObject) {
   //   });
   // }
 
-  console.log("resultresult", result);
+  // console.log("resultresult", result);
   // for(var i=0; i < cartObject.length; i++) {
 
   // }
 
 
-  return "Items";
+  return result;
 }
 
 function BuscarChildren(str, findChildren) {
   var childrens = str.split(",");
   // console.log("childrenschildrens",childrens);
   // console.log("findChildren",findChildren);
-  var hasFive = false;
+  // var hasFive = false;
 
   for (var counter = 0; counter < childrens.length; counter++) {
-    console.log("----------------------------------");
-    console.log("se childrens", childrens[counter]);
-    console.log("se findChildren", findChildren);
-    console.log("----------------------------------");
-    if (childrens[counter] == findChildren) {
+
+    if (parseInt(childrens[counter]) == parseInt(findChildren)) {
       console.log("se encontro", findChildren);
-      hasFive = true;
-      break;
+      //  hasFive = true;
+      //  break;
+      return true;
     }
   }
 
-  return hasFive;
+  return false;
 }
 
 // [{
@@ -4392,7 +4400,7 @@ var CartComplement = function (_Component) {
       this.getCarts();
       this.getComplementos();
 
-      this.getNewCart();
+      // this.getNewCart();
     }
   }, {
     key: 'openModal',
@@ -4457,7 +4465,8 @@ var CartComplement = function (_Component) {
 
         console.log("NEW CART111", body);
         //
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* formatNewCart */])(body);
+        // this.state. formatNewCart(body);
+
       });
     }
   }, {
@@ -4495,6 +4504,7 @@ var CartComplement = function (_Component) {
           count: count,
           carts: body.length > 0 ? body : []
         });
+
         // console.log(type);
         if (type == 'cerrar') {
           // this.loadingBlock();
@@ -4896,7 +4906,7 @@ var Productos = function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      console.log('componentDidMount state', this.props.productos);
+      console.log('componentDidMount state1111', this.props.productos);
       // this.getCarts();
 
       setTimeout(function () {
@@ -6522,6 +6532,39 @@ var CartBlock = function (_Component) {
             });
         }
     }, {
+        key: 'getCarts',
+        value: function getCarts(type) {
+            var _this3 = this;
+
+            console.log('LOAD111111111 CART');
+
+            var x = Math.floor(Math.random() * 199998880 + 1);
+            // const url = `${baseUrl}/cart?_format=json`;
+            var url = __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* baseUrl */] + '/api/carts?_format=json&t=' + x;
+            __WEBPACK_IMPORTED_MODULE_2_superagent___default.a.get(url).end(function (err, _ref2) {
+                var body = _ref2.body;
+
+                // let count = 0;
+                // for (let i in body) {
+                //   count += body[i].order_items.length;
+                // }
+                // console.log("body",body);
+                body = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* formatNewCart */])(body);
+
+                _this3.setState({
+                    loaded: true,
+                    count: count,
+                    carts: body.order_id > 0 ? body : []
+                });
+
+                if (type == 'open') {
+                    _this3.setState({ loading_block: true });
+                    _this3.setState({ loading_block: false });
+                    _this3.setState({ container_enable: true });
+                }
+            });
+        }
+    }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
             // console.log("propsss", this.props);
@@ -6538,14 +6581,14 @@ var CartBlock = function (_Component) {
     }, {
         key: 'loadingBlock',
         value: function loadingBlock() {
-            var _this3 = this;
+            var _this4 = this;
 
             this.setState({ loading_block: true });
             console.log("loasssssssss");
             this.openCartBlock();
             setTimeout(function () {
-                _this3.setState({ loading_block: false });
-                _this3.setState({ container_enable: false });
+                _this4.setState({ loading_block: false });
+                _this4.setState({ container_enable: false });
             }, 1500);
         }
     }, {
@@ -6574,7 +6617,7 @@ var CartBlock = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this4 = this;
+            var _this5 = this;
 
             console.log("propssss", this.props);
 
@@ -6594,7 +6637,7 @@ var CartBlock = function (_Component) {
                     'section',
                     { className: this.state.block ? 'menu-lateral active' : 'menu-lateral' },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'background-flor', onClick: function onClick() {
-                            return _this4.props.changeOpen();
+                            return _this5.props.changeOpen();
                         } }),
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         'div',
@@ -6628,7 +6671,7 @@ var CartBlock = function (_Component) {
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'span',
                                     { onClick: function onClick() {
-                                            return _this4.props.changeOpen();
+                                            return _this5.props.changeOpen();
                                         } },
                                     ' ',
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fas fa-times js-close' })
