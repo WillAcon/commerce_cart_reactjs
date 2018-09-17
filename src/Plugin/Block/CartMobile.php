@@ -9,12 +9,12 @@ use Drupal\Core\Render\Markup;
  * Provides a cart block.
  *
  * @Block(
- *   id = "commerce_cart_reactjs",
- *   admin_label = @Translation("Cart (ReactJS)"),
+ *   id = "commerce_cart_reactjs_mobile",
+ *   admin_label = @Translation("Cart (ReactJS) mobile"),
  *   category = @Translation("Commerce")
  * )
  */
-class CartBlock extends BlockBase {
+class CartMobile extends BlockBase {
 
   /**
    * {@inheritdoc}
@@ -26,7 +26,7 @@ class CartBlock extends BlockBase {
           'commerce_cart_reactjs/components',
         ],
       ],
-      '#markup' => Markup::create('<div id="reactCartTop"></div>'),
+      '#markup' => Markup::create('<div id="reactCartMobile"></div>'),
     ];
   }
 
