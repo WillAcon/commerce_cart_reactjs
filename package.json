@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "react-modal": "^3.4.5"
+    "react-modal": "^3.4.5",
+    "redux-actions": "^2.6.4",
+    "redux-promise": "^0.6.0",
+    "reselect": "^4.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
